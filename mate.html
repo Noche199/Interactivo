@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MathVerse — Educación Matemática del Futuro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    /* ============================================================
+       1. CSS VARIABLES & THEMES
+    ============================================================ */
+    :root {
+      --bg:          #060c1a;
+      --bg2:         #0d1628;
+      --sf1:         rgba(255,255,255,0.04);
+      --sf2:         rgba(255,255,255,0.08);
+      --sf3:         rgba(255,255,255,0.13);
+      --bd:          rgba(255,255,255,0.08);
+      --bd2:         rgba(99,102,241,0.35);
+      --pr:          #6366f1;
+      --prl:         #818cf8;
+      --prg:         rgba(99,102,241,0.25);
+      --sc:          #22d3ee;
+      --scg:         rgba(34,211,238,0.2);
+      --ac:          #a78bfa;
+      --acg:         rgba(167,139,250,0.2);
+      --am:          #f59e0b;
+      --tx:          #e2e8f0;
+      --tx2:         #94a3b8;
+      --tx3:         #475569;
+      --ok:          #10b981;
+      --er:          #ef4444;
+      --nh:          70px;
+      --rs:          10px;
+      --rm:          16px;
+      --rl:          24px;
+      --rxl:         32px;
+      --sh:          0 4px 24px rgba(0,0,0,.45);
+      --shg:         0 0 40px rgba(99,102,241,.15);
+    }
+    [data-theme="light"] {
+      --bg:  #f0f4ff; --bg2: #e4eaff;
+      --sf1: rgba(255,255,255,.65); --sf2: rgba(255,255,255,.82); --sf3: rgba(255,255,255,.95);
+      --bd:  rgba(0,0,0,.08); --bd2: rgba(99,102,241,.3);
+      --tx:  #0f172a; --tx2: #475569; --tx3: #94a3b8;
+      --sh:  0 4px 24px rgba(0,0,0,.1);
+    }
+
+    /* ============================================================
+       2. RESET & BASE
+    ============================================================ */
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{
+      font-family:'Sora',sans-serif;
+      background:var(--bg);
+      color:var(--tx);
+      min-height:100vh;
+      overflow-x:hidden;
+      line-height:1.6;
+      transition:background .3s,color .3s;
+    }
+    .mono,code,.eq,select,input[type="number"],input[type="text"].mono{
+      font-family:'JetBrains Mono',monospace;
+    }
+    button{cursor:pointer;}
+    a{text-decoration:none;color:inherit;}
+
+    /* ============================================================
+       3. CANVAS BACKGROUND
+    ============================================================ */
+    #mathCanvas{
+      position:fixed;top:0;left:0;width:100%;height:100%;
+      pointer-events:none;z-index:0;opacity:.35;
+    }
+
+    /* ============================================================
+       4. NAVBAR
+    ============================================================ */
+    .navbar{
+      position:fixed;top:0;left:0;right:0;height:var(--nh);z-index:100;
+      backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);
+      background:rgba(6,12,26,.88);
+      border-bottom:1px solid var(--bd);
+      transition:background .3s;
+    }
+    [data-theme="light"] .navbar{background:rgba(240,244,255,.92);}
+    .nav-container{
+      max-width:1200px;margin:0 auto;height:100%;
+      padding:0 24px;display:flex;align-items:center;gap:12px;
+    }
+    .nav-brand{display:flex;align-items:center;gap:10px;font-size:1.15rem;font-weight:700;flex-shrink:0;}
+    .nav-brand em{font-style:normal;color:var(--prl);}
+    .brand-icon{
+      width:38px;height:38px;
+      background:linear-gradient(135deg,var(--pr),var(--ac));
+      border-radius:10px;display:flex;align-items:center;justify-content:center;
+      font-size:1.15rem;font-family:'JetBrains Mono',monospace;color:#fff;
+      box-shadow:0 4px 14px var(--prg);
+    }
+    .nav-links{display:flex;align-items:center;gap:4px;margin-left:auto;}
+    .nav-link{
+      display:flex;align-items:center;gap:7px;
+      padding:8px 18px;border-radius:50px;
+      color:var(--tx2);font-size:.875rem;font-weight:500;
+      transition:all .25s ease;
+    }
+    .nav-link:hover{color:var(--tx);background:var(--sf2);}
+    .nav-link.active{color:var(--prl);background:var(--prg);}
+    .nav-link i{font-size:.82rem;}
+    .nav-actions{display:flex;align-items:center;gap:8px;margin-left:16px;}
+    .icon-btn{
+      width:38px;height:38px;border:1px solid var(--bd);background:var(--sf1);color:var(--tx2);
+      border-radius:50%;display:flex;align-items:center;justify-content:center;
+      font-size:.88rem;transition:all .25s;
+    }
+    .icon-btn:hover{background:var(--sf2);color:var(--tx);border-color:var(--pr);}
+    .nav-mob{display:none;}
+
+    @media(max-width:700px){
+      .nav-mob{display:flex;}
+      .nav-links{
+        position:fixed;top:var(--nh);left:0;right:0;
+        background:var(--bg2);border-bottom:1px solid var(--bd);
+        flex-direction:column;padding:16px;gap:8px;
+        transform:translateY(-110%);opacity:0;pointer-events:none;
+        transition:all .35s cubic-bezier(.34,1.56,.64,1);margin-left:0;
+      }
+      .nav-links.open{transform:translateY(0);opacity:1;pointer-events:auto;}
+      .nav-link{width:100%;justify-content:center;padding:12px 24px;}
+    }
+
+    /* ============================================================
+       5. SCREENS
+    ============================================================ */
+    .app-main{padding-top:var(--nh);position:relative;z-index:1;}
+    .screen{
+      min-height:calc(100vh - var(--nh));
+      padding:56px 24px 80px;max-width:1200px;margin:0 auto;
+      display:none;
+      animation:sIn .4s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    .screen.active{display:block;}
+    @keyframes sIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+    /* glass card */
+    .gc{
+      background:var(--sf1);border:1px solid var(--bd);border-radius:var(--rl);
+      backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+      padding:32px;transition:border-color .3s,box-shadow .3s;
+    }
+    .gc:hover{border-color:var(--bd2);box-shadow:var(--shg);}
+
+    /* section header */
+    .sh{text-align:center;margin-bottom:48px;}
+    .sh h2{
+      font-size:clamp(1.75rem,4vw,2.4rem);font-weight:700;margin-bottom:10px;
+      background:linear-gradient(135deg,var(--tx),var(--prl));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .sh p{color:var(--tx2);font-size:1rem;}
+
+    /* ============================================================
+       6. HOME — HERO
+    ============================================================ */
+    .hero{
+      display:grid;grid-template-columns:1fr 1fr;gap:48px;
+      align-items:center;min-height:72vh;margin-bottom:72px;
+    }
+    @media(max-width:768px){
+      .hero{grid-template-columns:1fr;min-height:auto;gap:40px;text-align:center;}
+    }
+    .hero-badge{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 16px;background:var(--prg);border:1px solid var(--bd2);
+      border-radius:50px;font-size:.78rem;color:var(--prl);margin-bottom:20px;
+    }
+    .hero-title{
+      font-size:clamp(2.4rem,6vw,4.2rem);font-weight:800;
+      line-height:1.08;margin-bottom:18px;letter-spacing:-1px;
+    }
+    .gt{
+      background:linear-gradient(135deg,var(--prl),var(--sc),var(--ac));
+      background-size:200% auto;
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      animation:gshift 4s ease infinite;
+    }
+    @keyframes gshift{0%,100%{background-position:0% center}50%{background-position:100% center}}
+    .hero-sub{font-size:1.05rem;color:var(--tx2);max-width:480px;margin-bottom:28px;line-height:1.75;}
+    @media(max-width:768px){.hero-sub{margin:0 auto 28px;}}
+
+    .hero-stats{display:flex;align-items:center;gap:24px;margin-bottom:28px;}
+    @media(max-width:768px){.hero-stats{justify-content:center;}}
+    .sn{font-size:1.75rem;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--prl);line-height:1;}
+    .sl{font-size:.72rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;}
+    .sdv{width:1px;height:38px;background:var(--bd);}
+
+    .hero-cta{display:flex;gap:12px;flex-wrap:wrap;}
+    @media(max-width:768px){.hero-cta{justify-content:center;}}
+
+    /* buttons */
+    .btn-p{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:13px 28px;background:linear-gradient(135deg,var(--pr),var(--ac));
+      color:#fff;border:none;border-radius:50px;
+      font-family:'Sora',sans-serif;font-size:.9rem;font-weight:600;
+      transition:all .25s;box-shadow:0 4px 20px var(--prg);
+    }
+    .btn-p:hover{transform:translateY(-2px);box-shadow:0 8px 30px var(--prg);}
+    .btn-g{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:13px 28px;background:var(--sf1);color:var(--tx);
+      border:1px solid var(--bd);border-radius:50px;
+      font-family:'Sora',sans-serif;font-size:.9rem;font-weight:500;
+      transition:all .25s;
+    }
+    .btn-g:hover{background:var(--sf2);border-color:var(--pr);color:var(--prl);}
+    /* Amber / game button */
+    .btn-am{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:13px 28px;background:linear-gradient(135deg,#f59e0b,#d97706);
+      color:#fff;border:none;border-radius:50px;
+      font-family:'Sora',sans-serif;font-size:.9rem;font-weight:600;
+      transition:all .25s;box-shadow:0 4px 20px rgba(245,158,11,.35);
+    }
+    .btn-am:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(245,158,11,.45);}
+    /* Cyan / tutor-ext button */
+    .btn-sc{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:13px 28px;background:linear-gradient(135deg,#06b6d4,#0891b2);
+      color:#fff;border:none;border-radius:50px;
+      font-family:'Sora',sans-serif;font-size:.9rem;font-weight:600;
+      transition:all .25s;box-shadow:0 4px 20px rgba(34,211,238,.28);
+    }
+    .btn-sc:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(34,211,238,.4);}
+    /* ext link card overrides */
+    .cat-card.ext { cursor:pointer; }
+    .ext-badge{
+      display:inline-flex;align-items:center;gap:5px;
+      font-size:.66rem;padding:3px 8px;border-radius:50px;
+      background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+      color:var(--tx3);margin-bottom:12px;letter-spacing:.04em;
+    }
+    .ext-badge i{font-size:.6rem;}
+
+    /* ---- hero visual ---- */
+    .hero-visual{
+      position:relative;height:420px;
+      display:flex;align-items:center;justify-content:center;
+    }
+    @media(max-width:768px){.hero-visual{height:280px;}}
+
+    .math-orb{position:relative;width:160px;height:160px;display:flex;align-items:center;justify-content:center;}
+    .orb-core{
+      width:90px;height:90px;border-radius:50%;
+      background:linear-gradient(135deg,var(--pr),var(--ac));
+      display:flex;align-items:center;justify-content:center;
+      font-family:'JetBrains Mono',monospace;font-size:2.3rem;color:#fff;z-index:2;
+      box-shadow:0 0 50px var(--prg),0 0 100px rgba(99,102,241,.12);
+      animation:opulse 3s ease-in-out infinite;
+    }
+    @keyframes opulse{0%,100%{box-shadow:0 0 40px var(--prg)}50%{box-shadow:0 0 80px rgba(99,102,241,.55),0 0 160px rgba(99,102,241,.2)}}
+    .orb-ring{
+      position:absolute;inset:0;border-radius:50%;
+      border:1.5px solid rgba(99,102,241,.3);
+      animation:rring 8s linear infinite;
+    }
+    .orb-ring::before{
+      content:'';position:absolute;top:-5px;left:50%;transform:translateX(-50%);
+      width:9px;height:9px;background:var(--prl);border-radius:50%;
+      box-shadow:0 0 8px var(--pr);
+    }
+    .orb-ring.r2{inset:-34px;border-color:rgba(167,139,250,.22);animation:rring 14s linear infinite reverse;}
+    .orb-ring.r2::before{background:var(--ac);box-shadow:0 0 8px var(--ac);}
+    @keyframes rring{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+    .ff{
+      position:absolute;font-family:'JetBrains Mono',monospace;font-size:.82rem;
+      padding:7px 13px;background:var(--sf2);border:1px solid var(--bd);
+      border-radius:8px;color:var(--tx2);backdrop-filter:blur(10px);white-space:nowrap;
+    }
+    .ff.a{top:8%;left:0;animation:fl1 6s ease-in-out infinite;border-color:rgba(99,102,241,.3);}
+    .ff.b{top:22%;right:0;animation:fl2 7s ease-in-out infinite 1s;border-color:rgba(34,211,238,.3);color:var(--sc);}
+    .ff.c{bottom:22%;left:4%;animation:fl1 5.5s ease-in-out infinite 2s;border-color:rgba(167,139,250,.3);color:var(--ac);}
+    .ff.d{bottom:8%;right:4%;animation:fl2 8s ease-in-out infinite .5s;border-color:rgba(245,158,11,.3);color:var(--am);}
+    @keyframes fl1{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-12px) rotate(2deg)}}
+    @keyframes fl2{0%,100%{transform:translateY(0) rotate(2deg)}50%{transform:translateY(-16px) rotate(-2deg)}}
+
+    /* ============================================================
+       7. HOME — CATEGORY CARDS
+    ============================================================ */
+    .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:56px;}
+    @media(max-width:900px){.cat-grid{grid-template-columns:1fr;}}
+
+    .cat-card{
+      position:relative;background:var(--sf1);border:1px solid var(--bd);
+      border-radius:var(--rl);padding:32px;cursor:pointer;
+      transition:all .35s cubic-bezier(.22,1,.36,1);overflow:hidden;
+      backdrop-filter:blur(10px);
+    }
+    .cat-card:hover{transform:translateY(-6px);border-color:var(--bd2);}
+    .cat-card.feat{border-color:rgba(34,211,238,.22);}
+
+    .cat-glow{
+      position:absolute;top:-60%;left:-60%;width:220%;height:220%;
+      background:radial-gradient(circle,var(--prg) 0%,transparent 60%);
+      opacity:0;transition:opacity .35s;pointer-events:none;
+    }
+    .cat-card:hover .cat-glow{opacity:.55;}
+
+    .cat-ico{
+      width:54px;height:54px;border-radius:13px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.35rem;margin-bottom:18px;
+      background:color-mix(in srgb,var(--ic) 14%,transparent);
+      border:1px solid color-mix(in srgb,var(--ic) 28%,transparent);
+      color:var(--ic);
+    }
+    .cat-card h3{font-size:1.2rem;font-weight:700;margin-bottom:8px;}
+    .cat-card p{color:var(--tx2);font-size:.875rem;line-height:1.6;margin-bottom:18px;}
+    .ctags{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px;}
+    .ctags span{font-size:.7rem;padding:3px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:50px;color:var(--tx2);}
+    .carr{
+      width:34px;height:34px;background:var(--prg);border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      color:var(--prl);font-size:.78rem;margin-left:auto;transition:all .25s;
+    }
+    .cat-card:hover .carr{background:var(--pr);color:#fff;transform:translateX(4px);}
+
+    /* features bar */
+    .feat-bar{
+      display:grid;grid-template-columns:repeat(4,1fr);gap:16px;
+      padding:28px 32px;background:var(--sf1);border:1px solid var(--bd);border-radius:var(--rl);
+    }
+    @media(max-width:900px){.feat-bar{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:480px){.feat-bar{grid-template-columns:1fr;}}
+    .fi{display:flex;align-items:center;gap:14px;}
+    .fi-ico{
+      width:42px;height:42px;background:var(--prg);border:1px solid rgba(99,102,241,.2);
+      border-radius:12px;display:flex;align-items:center;justify-content:center;
+      color:var(--prl);font-size:.95rem;flex-shrink:0;
+    }
+    .fi h4{font-size:.85rem;font-weight:600;margin-bottom:2px;}
+    .fi p{font-size:.73rem;color:var(--tx2);}
+
+    /* ============================================================
+       8. FORMS SECTION
+    ============================================================ */
+    .ftabs{
+      display:flex;gap:6px;margin-bottom:28px;
+      background:var(--sf1);border:1px solid var(--bd);
+      padding:5px;border-radius:50px;width:fit-content;
+    }
+    @media(max-width:620px){.ftabs{width:100%;border-radius:var(--rm);flex-direction:column;}}
+    .ftab{
+      display:flex;align-items:center;gap:8px;padding:10px 20px;
+      border-radius:50px;border:none;background:transparent;
+      color:var(--tx2);font-family:'Sora',sans-serif;font-size:.875rem;font-weight:500;
+      transition:all .25s;white-space:nowrap;
+    }
+    .ftab:hover{color:var(--tx);background:var(--sf2);}
+    .ftab.active{background:var(--pr);color:#fff;box-shadow:0 4px 14px var(--prg);}
+
+    .fpanel{display:none;animation:sIn .3s ease forwards;}
+    .fpanel.active{display:block;}
+
+    .playout{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+    @media(max-width:768px){.playout{grid-template-columns:1fr;}}
+
+    .fhdr{display:flex;align-items:center;gap:14px;margin-bottom:24px;}
+    .fhdr-ico{
+      width:50px;height:50px;border-radius:13px;
+      display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;
+    }
+    .fi-ind{background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);color:var(--prl);}
+    .fi-cyn{background:rgba(34,211,238,.15);border:1px solid rgba(34,211,238,.3);color:var(--sc);}
+    .fi-vio{background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:var(--ac);}
+    .fhdr h3{font-size:1.1rem;font-weight:700;}
+    .fhdr p{font-size:.875rem;color:var(--tx2);}
+
+    .eq-prev{
+      background:var(--sf2);border:1px solid var(--bd);border-radius:var(--rs);
+      padding:14px 20px;margin-bottom:22px;
+      font-family:'JetBrains Mono',monospace;font-size:1.1rem;
+      text-align:center;color:var(--prl);letter-spacing:.05em;
+    }
+
+    .ffields{display:flex;flex-direction:column;gap:14px;margin-bottom:22px;}
+    .fg{display:flex;flex-direction:column;gap:7px;}
+    .fg label{font-size:.83rem;color:var(--tx2);font-weight:500;}
+    .fg label span{color:var(--prl);}
+    .iwrap{position:relative;display:flex;align-items:center;}
+    .iwrap input{
+      width:100%;padding:12px 44px 12px 16px;
+      background:var(--sf2);border:1px solid var(--bd);border-radius:var(--rs);
+      color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:.95rem;
+      transition:border-color .2s,box-shadow .2s;outline:none;
+    }
+    .iwrap input:focus{border-color:var(--pr);box-shadow:0 0 0 3px var(--prg);}
+    .iwrap input::placeholder{color:var(--tx3);}
+    .iu{position:absolute;right:13px;font-family:'JetBrains Mono',monospace;font-size:.88rem;color:var(--tx3);}
+
+    /* solve button */
+    .sbtn{
+      width:100%;padding:13px;background:linear-gradient(135deg,var(--pr),#4f46e5);
+      color:#fff;border:none;border-radius:var(--rs);
+      font-family:'Sora',sans-serif;font-size:.93rem;font-weight:600;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      transition:all .25s;box-shadow:0 4px 16px var(--prg);
+    }
+    .sbtn:hover{transform:translateY(-2px);box-shadow:0 8px 24px var(--prg);}
+    .sbtn.cyn{background:linear-gradient(135deg,#06b6d4,#0891b2);box-shadow:0 4px 16px var(--scg);}
+    .sbtn.cyn:hover{box-shadow:0 8px 24px var(--scg);}
+    .sbtn.vio{background:linear-gradient(135deg,var(--ac),#7c3aed);box-shadow:0 4px 16px var(--acg);}
+    .sbtn.vio:hover{box-shadow:0 8px 24px var(--acg);}
+
+    /* result card */
+    .res-hdr{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--bd);}
+    .res-hdr i{font-size:1.15rem;color:var(--ok);}
+    .res-hdr h3{font-size:1.05rem;font-weight:700;}
+    .rstep{
+      background:var(--sf2);border:1px solid var(--bd);border-radius:var(--rs);
+      padding:14px;margin-bottom:10px;
+      animation:sLeft .3s ease forwards;
+    }
+    @keyframes sLeft{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+    .rstep:nth-child(2){animation-delay:.05s;}
+    .rstep:nth-child(3){animation-delay:.1s;}
+    .rstep:nth-child(4){animation-delay:.15s;}
+    .slbl{font-size:.7rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;}
+    .sval{font-family:'JetBrains Mono',monospace;font-size:.98rem;color:var(--tx);}
+    .sval.hi{color:var(--prl);font-size:1.15rem;}
+    .sval.ok{color:var(--ok);}
+    .sval.wn{color:var(--am);}
+    .sval.er{color:var(--er);}
+    .snote{font-size:.78rem;color:var(--tx2);margin-top:5px;}
+
+    /* ============================================================
+       9. SHAPE SELECTOR (GEOMETRY)
+    ============================================================ */
+    .shsel{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+    @media(max-width:480px){.shsel{grid-template-columns:repeat(2,1fr);}}
+    .shbtn{
+      display:flex;flex-direction:column;align-items:center;gap:5px;
+      padding:10px 6px;background:var(--sf2);border:1px solid var(--bd);
+      border-radius:var(--rs);color:var(--tx2);
+      font-family:'Sora',sans-serif;font-size:.73rem;transition:all .2s;
+    }
+    .shbtn:hover{border-color:var(--sc);color:var(--sc);}
+    .shbtn.active{background:rgba(34,211,238,.14);border-color:var(--sc);color:var(--sc);}
+    .shviz{
+      background:var(--sf2);border:1px solid var(--bd);border-radius:var(--rs);
+      margin-bottom:16px;display:flex;align-items:center;justify-content:center;padding:16px;
+    }
+    #shapeCanvas{max-width:100%;border-radius:4px;}
+
+    /* ============================================================
+       10. UNIT CONVERTER
+    ============================================================ */
+    .ucrow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;}
+    @media(max-width:480px){.ucrow{grid-template-columns:repeat(2,1fr);}}
+    .ucbtn{
+      display:flex;align-items:center;justify-content:center;gap:5px;
+      padding:10px;background:var(--sf2);border:1px solid var(--bd);
+      border-radius:var(--rs);color:var(--tx2);
+      font-family:'Sora',sans-serif;font-size:.75rem;transition:all .2s;
+    }
+    .ucbtn:hover{border-color:var(--ac);color:var(--ac);}
+    .ucbtn.active{background:rgba(167,139,250,.14);border-color:var(--ac);color:var(--ac);}
+    .conv-row{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-bottom:14px;}
+    .conv-row select{
+      padding:11px 14px;background:var(--sf2);border:1px solid var(--bd);
+      border-radius:var(--rs);color:var(--tx);font-size:.875rem;
+      outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;
+      transition:border-color .2s;
+    }
+    .conv-row select:focus{border-color:var(--ac);}
+    .swp{
+      width:40px;height:40px;background:var(--sf2);border:1px solid var(--bd);
+      border-radius:50%;color:var(--tx2);
+      display:flex;align-items:center;justify-content:center;
+      transition:all .25s;flex-shrink:0;
+    }
+    .swp:hover{background:rgba(167,139,250,.18);border-color:var(--ac);color:var(--ac);transform:rotate(180deg);}
+    .ures{
+      background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(34,211,238,.1));
+      border:1px solid rgba(167,139,250,.28);border-radius:var(--rs);
+      padding:22px;text-align:center;min-height:76px;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      margin-bottom:14px;
+    }
+    .ures-n{font-family:'JetBrains Mono',monospace;font-size:1.55rem;font-weight:600;color:var(--ac);}
+    .ures-l{font-size:.78rem;color:var(--tx2);margin-top:3px;}
+    .ctable{}
+    .crow{
+      display:flex;justify-content:space-between;
+      padding:7px 0;border-bottom:1px solid var(--bd);color:var(--tx2);font-size:.8rem;
+    }
+    .crow:last-child{border-bottom:none;}
+    .crow span:last-child{font-family:'JetBrains Mono',monospace;color:var(--tx);}
+
+    /* ============================================================
+       11. AI TUTOR
+    ============================================================ */
+    #tutor.screen{padding:40px 24px;max-width:100%;}
+    .tlayout{
+      display:grid;grid-template-columns:290px 1fr;gap:24px;
+      height:calc(100vh - var(--nh) - 80px);max-width:1200px;margin:0 auto;
+    }
+    @media(max-width:900px){.tlayout{grid-template-columns:1fr;height:auto;}}
+
+    .tsidebar{
+      display:flex;flex-direction:column;gap:18px;
+      overflow-y:auto;height:100%;
+    }
+    @media(max-width:900px){.tsidebar{height:auto;}}
+
+    .tav-wrap{text-align:center;padding-bottom:18px;border-bottom:1px solid var(--bd);}
+    .tav{
+      width:76px;height:76px;border-radius:50%;
+      background:linear-gradient(135deg,var(--pr),var(--ac));
+      display:flex;align-items:center;justify-content:center;
+      font-family:'JetBrains Mono',monospace;font-size:1.9rem;color:#fff;
+      margin:0 auto 10px;box-shadow:0 8px 28px var(--prg);
+    }
+    .tav-wrap h3{font-size:.95rem;font-weight:700;margin-bottom:3px;}
+    .tav-wrap > p{font-size:.75rem;color:var(--tx2);}
+    .obadge{display:inline-flex;align-items:center;gap:6px;margin-top:7px;font-size:.73rem;color:var(--ok);}
+    .dot{width:7px;height:7px;background:var(--ok);border-radius:50%;animation:dpulse 2s ease-in-out infinite;}
+    @keyframes dpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+
+    .apibox{border:1px solid var(--bd);border-radius:var(--rs);overflow:hidden;}
+    .apihdr{
+      display:flex;align-items:center;gap:8px;padding:11px 14px;
+      background:var(--sf2);cursor:pointer;font-size:.8rem;color:var(--tx2);
+      transition:color .2s;
+    }
+    .apihdr:hover{color:var(--tx);}
+    .apichev{margin-left:auto;transition:transform .2s;}
+    .apichev.open{transform:rotate(180deg);}
+    .apibody{
+      padding:12px 14px;background:var(--sf1);border-top:1px solid var(--bd);
+      display:flex;flex-direction:column;gap:8px;
+    }
+    .apiinput{
+      width:100%;padding:9px 11px;background:var(--sf2);border:1px solid var(--bd);
+      border-radius:6px;color:var(--tx);font-family:'JetBrains Mono',monospace;
+      font-size:.78rem;outline:none;transition:border-color .2s;
+    }
+    .apiinput:focus{border-color:var(--pr);}
+    .savebtn{
+      padding:7px 14px;background:var(--pr);color:#fff;border:none;
+      border-radius:6px;font-family:'Sora',sans-serif;font-size:.78rem;
+      transition:background .2s;
+    }
+    .savebtn:hover{background:var(--prl);}
+    .apinote{font-size:.68rem;color:var(--tx3);}
+
+    .side-sec h4{font-size:.74rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+    .tchips{display:flex;flex-direction:column;gap:6px;}
+    .tchip{
+      padding:8px 12px;background:var(--sf2);border:1px solid var(--bd);
+      border-radius:var(--rs);color:var(--tx2);
+      font-family:'Sora',sans-serif;font-size:.78rem;text-align:left;
+      transition:all .2s;
+    }
+    .tchip:hover{background:var(--prg);border-color:var(--pr);color:var(--prl);}
+    .clrbtn{
+      display:flex;align-items:center;justify-content:center;gap:7px;padding:10px;
+      background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);
+      border-radius:var(--rs);color:var(--er);
+      font-family:'Sora',sans-serif;font-size:.78rem;transition:all .2s;margin-top:auto;
+    }
+    .clrbtn:hover{background:rgba(239,68,68,.2);}
+
+    /* chat main */
+    .tmain{
+      display:flex;flex-direction:column;height:100%;
+      background:var(--sf1);border:1px solid var(--bd);border-radius:var(--rl);overflow:hidden;
+    }
+    @media(max-width:900px){.tmain{height:500px;}}
+
+    .msgs{
+      flex:1;overflow-y:auto;padding:22px;
+      display:flex;flex-direction:column;gap:14px;
+      scrollbar-width:thin;scrollbar-color:var(--bd) transparent;
+    }
+    .msgs::-webkit-scrollbar{width:4px;}
+    .msgs::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px;}
+
+    .msg{display:flex;gap:11px;animation:msgin .3s ease forwards;}
+    @keyframes msgin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .msg.user{flex-direction:row-reverse;}
+    .mav{
+      width:34px;height:34px;border-radius:50%;flex-shrink:0;
+      background:linear-gradient(135deg,var(--pr),var(--ac));
+      display:flex;align-items:center;justify-content:center;
+      font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#fff;
+      box-shadow:0 4px 12px var(--prg);
+    }
+    .msg.user .mav{background:var(--sf3);color:var(--tx);font-size:.95rem;}
+    .mbub{
+      max-width:72%;background:var(--sf2);border:1px solid var(--bd);
+      border-radius:15px;padding:13px 16px;
+    }
+    .msg.user .mbub{
+      background:linear-gradient(135deg,rgba(99,102,241,.22),rgba(167,139,250,.16));
+      border-color:rgba(99,102,241,.25);
+    }
+    .mbub p{font-size:.875rem;color:var(--tx);margin-bottom:6px;line-height:1.65;}
+    .mbub p:last-of-type{margin-bottom:0;}
+    .mtime{font-size:.68rem;color:var(--tx3);margin-top:7px;}
+    .mbub code{
+      display:block;background:var(--sf3);border:1px solid var(--bd);border-radius:6px;
+      padding:10px 13px;font-size:.83rem;color:var(--sc);margin:8px 0;white-space:pre-wrap;
+    }
+
+    /* typing */
+    .typing{display:flex;gap:11px;}
+    .tdots{
+      display:flex;align-items:center;gap:4px;
+      padding:13px 16px;background:var(--sf2);border:1px solid var(--bd);border-radius:15px;
+    }
+    .tdots span{
+      width:7px;height:7px;background:var(--tx3);border-radius:50%;
+      animation:tbounce 1.2s ease infinite;
+    }
+    .tdots span:nth-child(2){animation-delay:.2s;}
+    .tdots span:nth-child(3){animation-delay:.4s;}
+    @keyframes tbounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-8px);background:var(--prl);}}
+
+    /* input area */
+    .cinput{padding:14px 22px;border-top:1px solid var(--bd);background:var(--sf1);}
+    .cinput-wrap{
+      display:flex;gap:10px;align-items:center;
+      background:var(--sf2);border:1px solid var(--bd);
+      border-radius:50px;padding:5px 5px 5px 18px;
+      transition:border-color .2s,box-shadow .2s;
+    }
+    .cinput-wrap:focus-within{border-color:var(--pr);box-shadow:0 0 0 3px var(--prg);}
+    .cinput-wrap input{
+      flex:1;background:none;border:none;outline:none;
+      color:var(--tx);font-family:'Sora',sans-serif;font-size:.875rem;
+    }
+    .cinput-wrap input::placeholder{color:var(--tx3);}
+    .sendbtn{
+      width:38px;height:38px;background:var(--pr);border:none;border-radius:50%;
+      color:#fff;display:flex;align-items:center;justify-content:center;
+      font-size:.82rem;transition:all .2s;flex-shrink:0;
+    }
+    .sendbtn:hover{background:var(--prl);transform:scale(1.07);}
+    .chint{font-size:.7rem;color:var(--tx3);text-align:center;margin-top:7px;}
+
+    /* error */
+    .errmsg{
+      padding:11px 15px;background:rgba(239,68,68,.1);
+      border:1px solid rgba(239,68,68,.25);border-radius:var(--rs);
+      color:var(--er);font-size:.85rem;
+    }
+
+    /* scrollbar global */
+    ::-webkit-scrollbar{width:6px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px;}
+
+    /* status badge in result */
+    .sbadge{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:4px 12px;border-radius:50px;font-size:.75rem;font-weight:500;margin-bottom:14px;
+    }
+    .sbadge.ok{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);color:var(--ok);}
+    .sbadge.wn{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);color:var(--am);}
+    .sbadge.er{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:var(--er);}
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     CANVAS BACKGROUND
+============================================================ -->
+<canvas id="mathCanvas"></canvas>
+
+<!-- ============================================================
+     NAVBAR
+============================================================ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a class="nav-brand" href="#">
+      <div class="brand-icon">∑</div>
+      <span>Math<em>Verse</em></span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="#" class="nav-link active" data-s="home">
+        <i class="fas fa-house"></i><span>Inicio</span>
+      </a>
+      <a href="#" class="nav-link" data-s="forms">
+        <i class="fas fa-calculator"></i><span>Calculadora</span>
+      </a>
+      <a href="#" class="nav-link" data-s="tutor">
+        <i class="fas fa-robot"></i><span>Tutor IA</span>
+      </a>
+    </div>
+    <div class="nav-actions">
+      <button class="icon-btn" id="themeBtn" title="Cambiar tema"><i class="fas fa-moon"></i></button>
+      <button class="icon-btn nav-mob" id="mobBtn"><i class="fas fa-bars"></i></button>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     APP MAIN
+============================================================ -->
+<main class="app-main">
+
+  <!-- ==================== HOME ==================== -->
+  <section class="screen active" id="home">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-content">
+        <div class="hero-badge"><i class="fas fa-star"></i> Plataforma de aprendizaje matemático</div>
+        <h1 class="hero-title">
+          Domina las<br>
+          <span class="gt">Matemáticas</span><br>
+          del Futuro
+        </h1>
+        <p class="hero-sub">Aprende, practica y comprende matemáticas con herramientas interactivas y un tutor inteligente diseñado para ti.</p>
+        <div class="hero-stats">
+          <div><div class="sn">50+</div><div class="sl">Fórmulas</div></div>
+          <div class="sdv"></div>
+          <div><div class="sn">3</div><div class="sl">Módulos</div></div>
+          <div class="sdv"></div>
+          <div><div class="sn">∞</div><div class="sl">Problemas</div></div>
+        </div>
+        <div class="hero-cta">
+          <a class="btn-p" href="https://gemini.google.com/gem/1_QnNt0xj4KfFybro9PY351AltrAEk_ri?usp=sharing" target="_blank" rel="noopener">
+            <i class="fas fa-file-pen"></i> Examen
+          </a>
+          <a class="btn-sc" href="https://gemini.google.com/gem/1Kva1Z1QOKQVlTr-Xh2sLRQslm0sZrTPE?usp=sharing" target="_blank" rel="noopener">
+            <i class="fas fa-robot"></i> Tutor IA
+          </a>
+          <a class="btn-am" href="https://rpgplayground.com/?post_type=game&p=249204" target="_blank" rel="noopener">
+            <i class="fas fa-gamepad"></i> Juego
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="math-orb">
+          <div class="orb-core">π</div>
+          <div class="orb-ring"></div>
+          <div class="orb-ring r2"></div>
+        </div>
+        <div class="ff a">ax² + bx + c = 0</div>
+        <div class="ff b">∫f(x)dx</div>
+        <div class="ff c">A = πr²</div>
+        <div class="ff d">e^(iπ) + 1 = 0</div>
+      </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="sh"><h2>Accesos Directos</h2><p>Elige una actividad y comienza de inmediato</p></div>
+    <div class="cat-grid">
+
+      <!-- EXAMEN -->
+      <a class="cat-card ext" href="https://gemini.google.com/gem/1_QnNt0xj4KfFybro9PY351AltrAEk_ri?usp=sharing"
+         target="_blank" rel="noopener" style="--ic:#6366f1; text-decoration:none; display:block;">
+        <div class="cat-glow"></div>
+        <div class="ext-badge"><i class="fab fa-google"></i> Gemini · Abre en nueva pestaña</div>
+        <div class="cat-ico"><i class="fas fa-file-pen"></i></div>
+        <h3>Examen</h3>
+        <p>Pon a prueba tu conocimiento con preguntas interactivas generadas por IA. ¡Demuestra lo que sabes!</p>
+        <div class="ctags"><span>Evaluación</span><span>IA</span><span>Gemini</span></div>
+        <div class="carr"><i class="fas fa-external-link-alt"></i></div>
+      </a>
+
+      <!-- TUTOR IA -->
+      <a class="cat-card ext feat" href="https://gemini.google.com/gem/1Kva1Z1QOKQVlTr-Xh2sLRQslm0sZrTPE?usp=sharing"
+         target="_blank" rel="noopener" style="--ic:#22d3ee; text-decoration:none; display:block;">
+        <div class="cat-glow"></div>
+        <div class="ext-badge"><i class="fab fa-google"></i> Gemini · Abre en nueva pestaña</div>
+        <div class="cat-ico"><i class="fas fa-robot"></i></div>
+        <h3>Tutor IA</h3>
+        <p>Aprende con un tutor inteligente que explica conceptos paso a paso y responde tus dudas en tiempo real.</p>
+        <div class="ctags"><span>Chat IA</span><span>Explicaciones</span><span>Gemini</span></div>
+        <div class="carr"><i class="fas fa-external-link-alt"></i></div>
+      </a>
+
+      <!-- JUEGO -->
+      <a class="cat-card ext" href="https://rpgplayground.com/?post_type=game&p=249204"
+         target="_blank" rel="noopener" style="--ic:#f59e0b; text-decoration:none; display:block;">
+        <div class="cat-glow"></div>
+        <div class="ext-badge"><i class="fas fa-dice-d20"></i> RPG Playground · Abre en nueva pestaña</div>
+        <div class="cat-ico"><i class="fas fa-gamepad"></i></div>
+        <h3>Juego</h3>
+        <p>Aprende matemáticas jugando. Aventura RPG donde resolver problemas matemáticos es tu superpoder.</p>
+        <div class="ctags"><span>RPG</span><span>Gamificación</span><span>Aventura</span></div>
+        <div class="carr"><i class="fas fa-external-link-alt"></i></div>
+      </a>
+
+    </div>
+
+    <!-- Features bar -->
+    <div class="feat-bar">
+      <div class="fi"><div class="fi-ico"><i class="fas fa-file-pen"></i></div><div><h4>Examen con IA</h4><p>Evalúa tu nivel en Gemini</p></div></div>
+      <div class="fi"><div class="fi-ico"><i class="fas fa-robot"></i></div><div><h4>Tutor Inteligente</h4><p>Aprende con Gemini IA</p></div></div>
+      <div class="fi"><div class="fi-ico"><i class="fas fa-gamepad"></i></div><div><h4>Juego RPG</h4><p>Matemáticas gamificadas</p></div></div>
+      <div class="fi"><div class="fi-ico"><i class="fas fa-calculator"></i></div><div><h4>Calculadora</h4><p>Resuelve paso a paso</p></div></div>
+    </div>
+  </section>
+
+  <!-- ==================== FORMS ==================== -->
+  <section class="screen" id="forms">
+    <div class="sh"><h2>Calculadora Matemática</h2><p>Resuelve problemas complejos paso a paso</p></div>
+
+    <div class="ftabs">
+      <button class="ftab active" data-p="quadratic">
+        <i class="fas fa-superscript"></i><span>Ecuación Cuadrática</span>
+      </button>
+      <button class="ftab" data-p="geometry">
+        <i class="fas fa-shapes"></i><span>Geometría</span>
+      </button>
+      <button class="ftab" data-p="units">
+        <i class="fas fa-arrows-left-right"></i><span>Conversión</span>
+      </button>
+    </div>
+
+    <!-- PANEL: Quadratic -->
+    <div class="fpanel active" id="panel-quadratic">
+      <div class="playout">
+        <div class="gc">
+          <div class="fhdr">
+            <div class="fhdr-ico fi-ind"><i class="fas fa-superscript"></i></div>
+            <div><h3>Ecuación Cuadrática</h3><p class="mono">ax² + bx + c = 0</p></div>
+          </div>
+          <div class="eq-prev" id="eqPrev">__ x² + __ x + __ = 0</div>
+          <div class="ffields">
+            <div class="fg">
+              <label>Coeficiente <span class="mono">a</span> (de x²)</label>
+              <div class="iwrap">
+                <input type="number" id="qa" placeholder="Ej: 1" step="any" oninput="updateEqPrev()">
+                <span class="iu">a</span>
+              </div>
+            </div>
+            <div class="fg">
+              <label>Coeficiente <span class="mono">b</span> (de x)</label>
+              <div class="iwrap">
+                <input type="number" id="qb" placeholder="Ej: -5" step="any" oninput="updateEqPrev()">
+                <span class="iu">b</span>
+              </div>
+            </div>
+            <div class="fg">
+              <label>Término independiente <span class="mono">c</span></label>
+              <div class="iwrap">
+                <input type="number" id="qc" placeholder="Ej: 6" step="any" oninput="updateEqPrev()">
+                <span class="iu">c</span>
+              </div>
+            </div>
+          </div>
+          <button class="sbtn" onclick="solveQuad()"><i class="fas fa-play"></i> Resolver Ecuación</button>
+        </div>
+
+        <div class="gc" id="qres" style="display:none">
+          <div class="res-hdr"><i class="fas fa-check-circle"></i><h3>Solución Detallada</h3></div>
+          <div id="qout"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL: Geometry -->
+    <div class="fpanel" id="panel-geometry">
+      <div class="playout">
+        <div class="gc">
+          <div class="fhdr">
+            <div class="fhdr-ico fi-cyn"><i class="fas fa-shapes"></i></div>
+            <div><h3>Geometría</h3><p>Áreas, perímetros y volúmenes</p></div>
+          </div>
+          <div class="fg" style="margin-bottom:14px">
+            <label>Selecciona la Figura</label>
+            <div class="shsel">
+              <button class="shbtn active" onclick="selShape('circle',this)"><i class="fas fa-circle"></i>Círculo</button>
+              <button class="shbtn" onclick="selShape('rect',this)"><i class="fas fa-square"></i>Rectángulo</button>
+              <button class="shbtn" onclick="selShape('tri',this)"><i class="fas fa-play"></i>Triángulo</button>
+              <button class="shbtn" onclick="selShape('trap',this)"><i class="fas fa-layer-group"></i>Trapecio</button>
+            </div>
+          </div>
+          <div class="shviz"><canvas id="shapeCanvas" width="220" height="150"></canvas></div>
+          <div class="ffields" id="gfields"></div>
+          <button class="sbtn cyn" onclick="solveGeo()"><i class="fas fa-ruler-combined"></i> Calcular</button>
+        </div>
+
+        <div class="gc" id="gres" style="display:none">
+          <div class="res-hdr"><i class="fas fa-check-circle" style="color:var(--sc)"></i><h3>Resultado</h3></div>
+          <div id="gout"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL: Units -->
+    <div class="fpanel" id="panel-units">
+      <div class="playout">
+        <div class="gc">
+          <div class="fhdr">
+            <div class="fhdr-ico fi-vio"><i class="fas fa-arrows-left-right"></i></div>
+            <div><h3>Conversión de Unidades</h3><p>Entre sistemas de medición</p></div>
+          </div>
+          <div class="ucrow">
+            <button class="ucbtn active" onclick="setUcat('length',this)"><i class="fas fa-ruler"></i>Longitud</button>
+            <button class="ucbtn" onclick="setUcat('weight',this)"><i class="fas fa-weight-hanging"></i>Peso</button>
+            <button class="ucbtn" onclick="setUcat('temp',this)"><i class="fas fa-temperature-half"></i>Temp.</button>
+            <button class="ucbtn" onclick="setUcat('area',this)"><i class="fas fa-vector-square"></i>Área</button>
+          </div>
+          <div class="fg" style="margin-bottom:12px">
+            <label>Valor a convertir</label>
+            <div class="iwrap">
+              <input type="number" id="uval" placeholder="0" step="any" oninput="convertU()">
+            </div>
+          </div>
+          <div class="conv-row">
+            <select id="ufrom" onchange="convertU()"></select>
+            <button class="swp" onclick="swapU()"><i class="fas fa-arrow-right-arrow-left"></i></button>
+            <select id="uto" onchange="convertU()"></select>
+          </div>
+          <div class="ures"><span class="ures-n" id="uresn">—</span><span class="ures-l" id="uresl"></span></div>
+          <div class="ctable" id="ctable"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TUTOR ==================== -->
+  <section class="screen" id="tutor">
+    <div class="tlayout">
+      <!-- Sidebar -->
+      <div class="tsidebar gc">
+        <div class="tav-wrap">
+          <div class="tav">∑</div>
+          <h3>Tutor MathVerse</h3>
+          <p>Asistente Matemático con IA</p>
+          <div class="obadge"><span class="dot"></span>En línea</div>
+        </div>
+
+        <div class="apibox">
+          <div class="apihdr" onclick="toggleApi()">
+            <i class="fas fa-key"></i><span>Clave API Anthropic</span>
+            <i class="fas fa-chevron-down apichev" id="apichev"></i>
+          </div>
+          <div class="apibody" id="apibody" style="display:none">
+            <input type="password" class="apiinput" id="apikey" placeholder="sk-ant-api03-...">
+            <button class="savebtn" onclick="saveKey()">Guardar clave</button>
+            <p class="apinote">Necesaria para activar el chat con Claude. Tu clave se guarda localmente.</p>
+          </div>
+        </div>
+
+        <div class="side-sec">
+          <h4><i class="fas fa-lightbulb"></i> Temas Sugeridos</h4>
+          <div class="tchips">
+            <button class="tchip" onclick="ask('¿Cómo se resuelve una ecuación cuadrática paso a paso?')">Ecuaciones cuadráticas</button>
+            <button class="tchip" onclick="ask('Explícame el Teorema de Pitágoras con ejemplos')">Teorema de Pitágoras</button>
+            <button class="tchip" onclick="ask('¿Qué es una derivada y para qué sirve en la práctica?')">Derivadas</button>
+            <button class="tchip" onclick="ask('¿Cómo calcular el área de un círculo?')">Área del círculo</button>
+            <button class="tchip" onclick="ask('Explícame los límites en cálculo diferencial')">Límites</button>
+            <button class="tchip" onclick="ask('¿Qué son los logaritmos y cómo se usan?')">Logaritmos</button>
+            <button class="tchip" onclick="ask('¿Cómo funciona la regla de la cadena?')">Regla de la cadena</button>
+          </div>
+        </div>
+
+        <button class="clrbtn" onclick="clearChat()"><i class="fas fa-trash"></i> Limpiar conversación</button>
+      </div>
+
+      <!-- Chat main -->
+      <div class="tmain">
+        <div class="msgs" id="msgs">
+          <div class="msg">
+            <div class="mav">∑</div>
+            <div class="mbub">
+              <p>¡Hola! Soy tu <strong>Tutor Matemático con IA</strong>. 👋</p>
+              <p>Puedo ayudarte a entender conceptos matemáticos, resolver problemas paso a paso, y explicarte desde álgebra básica hasta cálculo avanzado.</p>
+              <p>¿Qué tema matemático quieres explorar hoy? Usa los temas sugeridos o escribe tu pregunta. Para activar el chat completo con Claude, ingresa tu clave API de Anthropic en el panel izquierdo.</p>
+              <div class="mtime">Ahora</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cinput">
+          <div class="cinput-wrap">
+            <input type="text" id="chatIn" placeholder="Escribe tu pregunta matemática..." onkeypress="if(event.key==='Enter')sendMsg()">
+            <button class="sendbtn" onclick="sendMsg()"><i class="fas fa-paper-plane"></i></button>
+          </div>
+          <p class="chint">Enter para enviar · Powered by Claude Sonnet</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+/* ==========================================================
+   CANVAS PARTICLES — floating math symbols
+========================================================== */
+(function(){
+  const canvas = document.getElementById('mathCanvas');
+  if(!canvas) return; // safety: abort if canvas not present
+  const ctx    = canvas.getContext('2d');
+  const syms   = ['∑','π','∫','√','∞','Δ','θ','φ','λ','μ','±','≈','∂','ℝ','∀','∃','∏','α','β','γ'];
+  let W, H, parts = [];
+
+  function resize(){
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function createPart(){
+    return {
+      x:   Math.random()*W,
+      y:   Math.random()*H,
+      sym: syms[Math.floor(Math.random()*syms.length)],
+      sz:  10 + Math.random()*22,
+      vx:  (Math.random()-.5)*.35,
+      vy:  (Math.random()-.5)*.35,
+      op:  .04 + Math.random()*.12,
+      col: ['#6366f1','#22d3ee','#a78bfa','#f59e0b'][Math.floor(Math.random()*4)],
+    };
+  }
+
+  function init(){
+    resize();
+    parts = Array.from({length:55}, createPart);
+  }
+
+  function tick(){
+    ctx.clearRect(0,0,W,H);
+    for(const p of parts){
+      p.x += p.vx; p.y += p.vy;
+      if(p.x<-40) p.x=W+40;
+      if(p.x>W+40) p.x=-40;
+      if(p.y<-40) p.y=H+40;
+      if(p.y>H+40) p.y=-40;
+      ctx.save();
+      ctx.globalAlpha = p.op;
+      ctx.fillStyle   = p.col;
+      ctx.font        = `${p.sz}px 'JetBrains Mono', monospace`;
+      ctx.fillText(p.sym, p.x, p.y);
+      ctx.restore();
+    }
+    requestAnimationFrame(tick);
+  }
+
+  window.addEventListener('resize', resize);
+  init(); tick();
+})();
+
+/* ==========================================================
+   NAVIGATION
+========================================================== */
+function nav(screen, panel){
+  // hide all screens
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  // show target
+  const target = document.getElementById(screen);
+  if(target){ target.classList.add('active'); }
+  // update nav links
+  document.querySelectorAll('.nav-link').forEach(l => {
+    l.classList.toggle('active', l.dataset.s === screen);
+  });
+  // close mobile menu
+  document.getElementById('navLinks').classList.remove('open');
+  // if panel requested, activate it
+  if(panel){ activatePanel(panel); }
+  // scroll top
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// Nav link clicks
+document.querySelectorAll('.nav-link').forEach(l => {
+  l.addEventListener('click', e => { e.preventDefault(); nav(l.dataset.s); });
+});
+
+// Mobile toggle
+document.getElementById('mobBtn').addEventListener('click', () => {
+  document.getElementById('navLinks').classList.toggle('open');
+});
+
+/* ==========================================================
+   THEME TOGGLE
+========================================================== */
+let dark = true;
+document.getElementById('themeBtn').addEventListener('click', () => {
+  dark = !dark;
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  document.getElementById('themeBtn').innerHTML = dark
+    ? '<i class="fas fa-moon"></i>'
+    : '<i class="fas fa-sun"></i>';
+  redrawShape();
+});
+
+/* ==========================================================
+   FORM TABS
+========================================================== */
+document.querySelectorAll('.ftab').forEach(btn => {
+  btn.addEventListener('click', () => activatePanel(btn.dataset.p));
+});
+
+function activatePanel(id){
+  document.querySelectorAll('.ftab').forEach(b => b.classList.toggle('active', b.dataset.p === id));
+  document.querySelectorAll('.fpanel').forEach(p => p.classList.toggle('active', p.id === 'panel-'+id));
+}
+
+/* ==========================================================
+   QUADRATIC SOLVER
+========================================================== */
+function updateEqPrev(){
+  const a = document.getElementById('qa').value || '__';
+  const b = document.getElementById('qb').value || '__';
+  const c = document.getElementById('qc').value || '__';
+  const bs = Number(b) < 0 ? `${b}` : (b === '__' ? `+ ${b}` : `+ ${b}`);
+  const cs = Number(c) < 0 ? `${c}` : (c === '__' ? `+ ${c}` : `+ ${c}`);
+  document.getElementById('eqPrev').textContent =
+    `${a}x² ${Number(b)<0||b==='__' ? bs : '+ '+b}x ${Number(c)<0||c==='__' ? cs : '+ '+c} = 0`;
+}
+
+function solveQuad(){
+  const a = parseFloat(document.getElementById('qa').value);
+  const b = parseFloat(document.getElementById('qb').value);
+  const c = parseFloat(document.getElementById('qc').value);
+  const res = document.getElementById('qres');
+  const out = document.getElementById('qout');
+
+  if(isNaN(a)||isNaN(b)||isNaN(c)){
+    out.innerHTML = '<div class="errmsg"><i class="fas fa-exclamation-triangle"></i> Por favor ingresa todos los coeficientes.</div>';
+    res.style.display = 'block'; return;
+  }
+  if(a === 0){
+    out.innerHTML = '<div class="errmsg">El coeficiente <strong>a</strong> no puede ser 0. En ese caso la ecuación es lineal.</div>';
+    res.style.display = 'block'; return;
+  }
+
+  const disc = b*b - 4*a*c;
+  const round = n => Math.round(n*10000)/10000;
+
+  let html = '';
+
+  // Step 1: formula
+  html += step('Fórmula General', 'x = (−b ± √(b²−4ac)) / 2a', '');
+  // Step 2: discriminante
+  html += step('Discriminante Δ = b²−4ac',
+    `Δ = (${b})² − 4·(${a})·(${c}) = ${round(b*b)} − ${round(4*a*c)} = ${round(disc)}`,
+    disc>0?'dos raíces reales distintas':disc===0?'raíz real doble':'raíces complejas conjugadas',
+    disc>0?'ok':disc===0?'wn':'er');
+
+  if(disc > 0){
+    const x1 = (-b + Math.sqrt(disc))/(2*a);
+    const x2 = (-b - Math.sqrt(disc))/(2*a);
+    html += step('Raíz x₁ = (−b + √Δ) / 2a', `x₁ = (${-b} + ${round(Math.sqrt(disc))}) / ${2*a} = ${round(x1)}`, '', 'hi');
+    html += step('Raíz x₂ = (−b − √Δ) / 2a', `x₂ = (${-b} − ${round(Math.sqrt(disc))}) / ${2*a} = ${round(x2)}`, '', 'hi');
+    html = badge('ok','✓ Dos raíces reales distintas') + html;
+  } else if(disc === 0){
+    const x0 = -b/(2*a);
+    html += step('Raíz doble x = −b / 2a', `x = ${-b} / ${2*a} = ${round(x0)}`, '', 'hi');
+    html = badge('wn','⚠ Raíz real doble') + html;
+  } else {
+    const re = round(-b/(2*a));
+    const im = round(Math.sqrt(-disc)/(2*a));
+    html += step('Parte real', `Re = ${-b} / ${2*a} = ${re}`, '');
+    html += step('Parte imaginaria', `Im = √(${round(-disc)}) / ${2*a} = ${im}`, '');
+    html += step('Soluciones complejas', `x₁ = ${re} + ${im}i\nx₂ = ${re} − ${im}i`, '', 'hi');
+    html = badge('er','✗ Sin raíces reales (complejas)') + html;
+  }
+
+  out.innerHTML = html;
+  res.style.display = 'block';
+}
+
+function step(label, value, note, cls=''){
+  return `<div class="rstep">
+    <div class="slbl">${label}</div>
+    <div class="sval ${cls}" style="white-space:pre-line">${value}</div>
+    ${note?`<div class="snote">${note}</div>`:''}
+  </div>`;
+}
+function badge(type, text){
+  return `<div class="sbadge ${type}">${text}</div>`;
+}
+
+/* ==========================================================
+   GEOMETRY SOLVER
+========================================================== */
+let curShape = 'circle';
+const geoInputs = {
+  circle:    [{id:'gr',  label:'Radio (r)',         unit:'unidades'}],
+  rect:      [{id:'gw',  label:'Base (b)',           unit:'unidades'},
+              {id:'gh',  label:'Altura (h)',          unit:'unidades'}],
+  tri:       [{id:'gta', label:'Base (a)',            unit:'unidades'},
+              {id:'gtb', label:'Lado (b)',             unit:'unidades'},
+              {id:'gtc', label:'Lado (c)',             unit:'unidades'},
+              {id:'gth', label:'Altura (h)',           unit:'unidades'}],
+  trap:      [{id:'gta', label:'Base mayor (a)',      unit:'unidades'},
+              {id:'gtb', label:'Base menor (b)',      unit:'unidades'},
+              {id:'gth', label:'Altura (h)',           unit:'unidades'}],
+};
+
+function selShape(s, btn){
+  curShape = s;
+  document.querySelectorAll('.shbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGeoFields();
+  redrawShape();
+}
+
+function renderGeoFields(){
+  const fields = geoInputs[curShape];
+  document.getElementById('gfields').innerHTML = fields.map(f=>`
+    <div class="fg">
+      <label>${f.label}</label>
+      <div class="iwrap">
+        <input type="number" id="${f.id}" placeholder="0" step="any" min="0" oninput="redrawShape()">
+        <span class="iu">${f.unit}</span>
+      </div>
+    </div>`).join('');
+}
+
+function gv(id){ return parseFloat(document.getElementById(id)?.value)||0; }
+
+function redrawShape(){
+  const c = document.getElementById('shapeCanvas');
+  const ctx = c.getContext('2d');
+  const W=220, H=150;
+  ctx.clearRect(0,0,W,H);
+  const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+  const stroke = isDark ? '#22d3ee' : '#0891b2';
+  const fill   = isDark ? 'rgba(34,211,238,0.1)' : 'rgba(34,211,238,0.15)';
+
+  ctx.strokeStyle = stroke; ctx.lineWidth = 2; ctx.fillStyle = fill;
+
+  const cx=W/2, cy=H/2;
+  if(curShape==='circle'){
+    ctx.beginPath(); ctx.arc(cx,cy,55,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    drawLabel(ctx,'r','→',cx+28,cy-16,stroke);
+  } else if(curShape==='rect'){
+    const bw=120, bh=80;
+    ctx.beginPath(); ctx.rect(cx-bw/2,cy-bh/2,bw,bh); ctx.fill(); ctx.stroke();
+    drawLabel(ctx,'b','↔',cx,cy+bh/2+16,stroke);
+    drawLabel(ctx,'h','↕',cx+bw/2+16,cy,stroke);
+  } else if(curShape==='tri'){
+    ctx.beginPath(); ctx.moveTo(cx,cy-60); ctx.lineTo(cx-70,cy+50); ctx.lineTo(cx+70,cy+50); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    drawLabel(ctx,'a','↔',cx,cy+66,stroke);
+    drawLabel(ctx,'h','↕',cx-80,cy,stroke);
+  } else if(curShape==='trap'){
+    const a=90, b=50, h=80;
+    const y1=cy-h/2, y2=cy+h/2;
+    ctx.beginPath();
+    ctx.moveTo(cx-a/2,y2); ctx.lineTo(cx+a/2,y2);
+    ctx.lineTo(cx+b/2,y1); ctx.lineTo(cx-b/2,y1); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    drawLabel(ctx,'a','↔',cx,y2+16,stroke);
+    drawLabel(ctx,'b','↔',cx,y1-10,stroke);
+    drawLabel(ctx,'h','↕',cx+a/2+14,cy,stroke);
+  }
+}
+
+function drawLabel(ctx, text, sym, x, y, color){
+  ctx.fillStyle = color;
+  ctx.font = "bold 12px 'JetBrains Mono',monospace";
+  ctx.textAlign = 'center';
+  ctx.fillText(`${text}`, x, y);
+}
+
+function solveGeo(){
+  const res = document.getElementById('gres');
+  const out = document.getElementById('gout');
+  let html = '';
+  const π = Math.PI;
+  const r = n => Math.round(n*10000)/10000;
+
+  if(curShape==='circle'){
+    const rad = gv('gr');
+    if(!rad){ out.innerHTML='<div class="errmsg">Ingresa el radio.</div>'; res.style.display='block'; return; }
+    const area = π*rad*rad, peri = 2*π*rad;
+    html += step('Área = π·r²', `A = π × ${rad}² = π × ${rad*rad} = ${r(area)} u²`, '', 'ok');
+    html += step('Perímetro (circunferencia) = 2πr', `P = 2 × π × ${rad} = ${r(peri)} u`, '', 'ok');
+    html += step('Diámetro = 2r', `D = 2 × ${rad} = ${r(2*rad)} u`, '');
+  } else if(curShape==='rect'){
+    const b=gv('gw'), h=gv('gh');
+    if(!b||!h){ out.innerHTML='<div class="errmsg">Ingresa base y altura.</div>'; res.style.display='block'; return; }
+    const area=b*h, peri=2*(b+h), diag=Math.sqrt(b*b+h*h);
+    html += step('Área = base × altura', `A = ${b} × ${h} = ${r(area)} u²`, '', 'ok');
+    html += step('Perímetro = 2(b + h)', `P = 2(${b} + ${h}) = ${r(peri)} u`, '', 'ok');
+    html += step('Diagonal = √(b²+h²)', `D = √(${b}²+${h}²) = √${r(b*b+h*h)} = ${r(diag)} u`, '');
+  } else if(curShape==='tri'){
+    const a=gv('gta'), b=gv('gtb'), c=gv('gtc'), h=gv('gth');
+    if(!a){ out.innerHTML='<div class="errmsg">Ingresa al menos la base.</div>'; res.style.display='block'; return; }
+    const peri = (a&&b&&c) ? r(a+b+c)+' u' : '— (faltan lados)';
+    if(h){
+      const area = (a*h)/2;
+      html += step('Área = (base × altura) / 2', `A = (${a} × ${h}) / 2 = ${r(area)} u²`, '', 'ok');
+    }
+    if(a&&b&&c){
+      const s=(a+b+c)/2;
+      const aHeron=Math.sqrt(s*(s-a)*(s-b)*(s-c));
+      html += step('Área (Herón) = √(s(s-a)(s-b)(s-c))', `s = ${r(s)}\nA = √(${r(s)}·${r(s-a)}·${r(s-b)}·${r(s-c)}) = ${r(aHeron)} u²`, '', 'ok');
+      html += step('Perímetro = a + b + c', `P = ${a} + ${b} + ${c} = ${r(a+b+c)} u`, '', 'ok');
+    }
+  } else if(curShape==='trap'){
+    const a=gv('gta'), b=gv('gtb'), h=gv('gth');
+    if(!a||!b||!h){ out.innerHTML='<div class="errmsg">Ingresa las dos bases y la altura.</div>'; res.style.display='block'; return; }
+    const area=((a+b)/2)*h;
+    html += step('Área = ((a+b)/2) × h', `A = ((${a}+${b})/2) × ${h} = ${r((a+b)/2)} × ${h} = ${r(area)} u²`, '', 'ok');
+    html += step('Suma de bases', `a + b = ${a} + ${b} = ${r(a+b)} u`, '');
+  }
+
+  out.innerHTML = badge('ok','✓ Cálculo completado') + html;
+  res.style.display = 'block';
+}
+
+/* ==========================================================
+   UNIT CONVERTER
+========================================================== */
+const unitData = {
+  length: {
+    label:'Longitud',
+    units:['metro','kilómetro','centímetro','milímetro','milla','pulgada','pie','yarda'],
+    toBase:[1, 1000, 0.01, 0.001, 1609.344, 0.0254, 0.3048, 0.9144],
+  },
+  weight: {
+    label:'Peso/Masa',
+    units:['kilogramo','gramo','miligramo','libra','onza','tonelada'],
+    toBase:[1, 0.001, 0.000001, 0.453592, 0.0283495, 1000],
+  },
+  temp: {
+    label:'Temperatura',
+    units:['Celsius','Fahrenheit','Kelvin'],
+    toBase:null, // special handling
+  },
+  area: {
+    label:'Área',
+    units:['m²','km²','cm²','mm²','hectárea','acre'],
+    toBase:[1, 1e6, 0.0001, 0.000001, 10000, 4046.856],
+  },
+};
+
+let uCat = 'length';
+
+function setUcat(cat, btn){
+  uCat = cat;
+  document.querySelectorAll('.ucbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  buildUnitSelects();
+  convertU();
+}
+
+function buildUnitSelects(){
+  const d = unitData[uCat];
+  const opts = d.units.map((u,i)=>`<option value="${i}">${u}</option>`).join('');
+  document.getElementById('ufrom').innerHTML = opts;
+  document.getElementById('uto').innerHTML   = opts;
+  document.getElementById('uto').value = '1';
+  convertU();
+}
+
+function convertU(){
+  const val = parseFloat(document.getElementById('uval').value);
+  const fi  = parseInt(document.getElementById('ufrom').value);
+  const ti  = parseInt(document.getElementById('uto').value);
+  const d   = unitData[uCat];
+
+  if(isNaN(val)){ document.getElementById('uresn').textContent='—'; document.getElementById('uresl').textContent=''; buildTable(NaN,fi,ti); return; }
+
+  let result;
+  if(uCat==='temp'){
+    result = convertTemp(val,fi,ti);
+  } else {
+    const base = val * d.toBase[fi];
+    result = base / d.toBase[ti];
+  }
+
+  const fmt = n => {
+    if(Math.abs(n) >= 1e6 || (Math.abs(n) < 0.001 && n !== 0)) return n.toExponential(4);
+    return Math.round(n*1000000)/1000000;
+  };
+
+  document.getElementById('uresn').textContent = fmt(result);
+  document.getElementById('uresl').textContent = `${d.units[fi]} → ${d.units[ti]}`;
+  buildTable(val, fi, ti);
+}
+
+function convertTemp(v, from, to){
+  let celsius;
+  if(from===0) celsius=v;
+  else if(from===1) celsius=(v-32)/1.8;
+  else celsius=v-273.15;
+
+  if(to===0) return celsius;
+  if(to===1) return celsius*1.8+32;
+  return celsius+273.15;
+}
+
+function swapU(){
+  const f = document.getElementById('ufrom');
+  const t = document.getElementById('uto');
+  const tmp = f.value; f.value = t.value; t.value = tmp;
+  convertU();
+}
+
+function buildTable(val, fi, ti){
+  const d = unitData[uCat];
+  if(isNaN(val)){ document.getElementById('ctable').innerHTML=''; return; }
+
+  let rows = '';
+  const fmt = n => {
+    if(Math.abs(n)>=1e9||(Math.abs(n)<0.0001&&n!==0)) return n.toExponential(3);
+    return Math.round(n*100000)/100000;
+  };
+
+  d.units.forEach((u,i)=>{
+    let res;
+    if(uCat==='temp') res=convertTemp(val,fi,i);
+    else { const base=val*d.toBase[fi]; res=base/d.toBase[i]; }
+    rows += `<div class="crow"><span>${u}</span><span>${fmt(res)}</span></div>`;
+  });
+
+  document.getElementById('ctable').innerHTML = rows;
+}
+
+/* ==========================================================
+   AI TUTOR — Claude API
+========================================================== */
+let apiKey = localStorage.getItem('mvApiKey') || '';
+let chatHistory = [];
+
+if(apiKey) document.getElementById('apikey').value = apiKey;
+
+function toggleApi(){
+  const body = document.getElementById('apibody');
+  const chev = document.getElementById('apichev');
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'flex';
+  chev.classList.toggle('open', !open);
+}
+
+function saveKey(){
+  apiKey = document.getElementById('apikey').value.trim();
+  localStorage.setItem('mvApiKey', apiKey);
+  addMsg('assistant', apiKey
+    ? '✅ ¡Clave guardada! Ahora puedes usar el tutor completo con Claude.'
+    : '⚠️ Clave eliminada. El tutor usará respuestas predefinidas.');
+}
+
+function ask(q){ document.getElementById('chatIn').value = q; sendMsg(); }
+
+async function sendMsg(){
+  const inp = document.getElementById('chatIn');
+  const q = inp.value.trim();
+  if(!q) return;
+  inp.value = '';
+  addMsg('user', q);
+  chatHistory.push({role:'user', content:q});
+  showTyping();
+
+  if(apiKey){
+    await callClaude(q);
+  } else {
+    await new Promise(r=>setTimeout(r,800));
+    removeTyping();
+    const ans = fallback(q);
+    addMsg('assistant', ans);
+    chatHistory.push({role:'assistant', content:ans});
+  }
+}
+
+async function callClaude(question){
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: `Eres un tutor de matemáticas amigable y experto. 
+Explica conceptos de forma clara y paso a paso.
+Usa notación matemática legible (sin LaTeX complejo).
+Incluye ejemplos prácticos siempre que sea posible.
+Responde en español. Sé conciso pero completo.
+Si muestras fórmulas, ponlas en líneas separadas con claridad.`,
+        messages: chatHistory.slice(-10),
+      }),
+    });
+
+    removeTyping();
+
+    if(!resp.ok){
+      const err = await resp.json().catch(()=>({}));
+      addMsg('assistant', `❌ Error de API: ${err.error?.message || resp.statusText}. Verifica tu clave API.`);
+      return;
+    }
+
+    const data = await resp.json();
+    const text = data.content?.map(c=>c.text||'').join('\n') || '(Sin respuesta)';
+    addMsg('assistant', text);
+    chatHistory.push({role:'assistant', content:text});
+
+  } catch(e){
+    removeTyping();
+    addMsg('assistant', `❌ Error de conexión: ${e.message}. Asegúrate de que tu clave sea correcta y tengas conexión.`);
+  }
+}
+
+function fallback(q){
+  const lq = q.toLowerCase();
+  if(lq.includes('cuadrática')||lq.includes('quadratic')||lq.includes('cuadratica')){
+    return `**Ecuaciones Cuadráticas** 📐\n\nUna ecuación cuadrática tiene la forma: ax² + bx + c = 0\n\nSe resuelve con la fórmula general:\n  x = (−b ± √(b²−4ac)) / 2a\n\nEl discriminante Δ = b²−4ac determina las raíces:\n• Δ > 0 → dos raíces reales distintas\n• Δ = 0 → una raíz real doble\n• Δ < 0 → raíces complejas (sin solución real)\n\n**Ejemplo:** x² − 5x + 6 = 0\nΔ = 25 − 24 = 1\nx₁ = (5+1)/2 = 3, x₂ = (5−1)/2 = 2\n\n¡Usa la sección Calculadora para resolverlas paso a paso!`;
+  }
+  if(lq.includes('pitágoras')||lq.includes('pitagoras')){
+    return `**Teorema de Pitágoras** △\n\nEn un triángulo rectángulo: a² + b² = c²\n\nDonde:\n• a, b = catetos (lados del ángulo recto)\n• c = hipotenusa (lado más largo)\n\n**Ejemplo:**\nSi a = 3 y b = 4, entonces:\nc² = 9 + 16 = 25\nc = √25 = 5\n\nEsto es la terna pitagórica (3, 4, 5).\n\n**Triples pitagóricos comunes:**\n• (3, 4, 5) → 9+16=25\n• (5, 12, 13) → 25+144=169\n• (8, 15, 17) → 64+225=289`;
+  }
+  if(lq.includes('derivada')||lq.includes('derivative')){
+    return `**Derivadas en Cálculo** ∂\n\nLa derivada mide la tasa de cambio instantánea de una función.\n\n**Definición:**\nf'(x) = lím(h→0) [f(x+h) − f(x)] / h\n\n**Reglas básicas:**\n• Constante: d/dx(k) = 0\n• Potencia: d/dx(xⁿ) = n·xⁿ⁻¹\n• Suma: (f+g)' = f'+g'\n• Producto: (f·g)' = f'g + fg'\n• Cociente: (f/g)' = (f'g − fg') / g²\n\n**Ejemplos:**\n• d/dx(x³) = 3x²\n• d/dx(5x² + 2x) = 10x + 2\n• d/dx(sen x) = cos x`;
+  }
+  if(lq.includes('logaritmo')){
+    return `**Logaritmos** log\n\nEl logaritmo es el inverso de la potencia.\n\nlog_b(x) = y  ⟺  b^y = x\n\n**Propiedades:**\n• log(a·b) = log(a) + log(b)\n• log(a/b) = log(a) − log(b)\n• log(aⁿ) = n·log(a)\n• Cambio de base: log_b(x) = log(x)/log(b)\n\n**Tipos comunes:**\n• log₁₀(x) → logaritmo decimal\n• ln(x) = log_e(x) → logaritmo natural\n\n**Ejemplo:** log₂(8) = 3 porque 2³ = 8`;
+  }
+  if(lq.includes('área')&&lq.includes('círculo')||lq.includes('circulo')){
+    return `**Área del Círculo** ⭕\n\nA = π × r²\n\nDonde:\n• π ≈ 3.14159265...\n• r = radio del círculo\n\n**Ejemplo:** Si r = 5 cm\nA = π × 5² = π × 25 ≈ 78.54 cm²\n\n**Otras fórmulas del círculo:**\n• Circunferencia = 2πr\n• Diámetro = 2r\n• Área con diámetro: A = π(d/2)²\n\n¡Prueba la sección de Geometría para calcular áreas al instante!`;
+  }
+  if(lq.includes('límite')||lq.includes('limite')){
+    return `**Límites en Cálculo** lím\n\nUn límite describe el comportamiento de f(x) cuando x se acerca a un valor.\n\n**Notación:** lím(x→a) f(x) = L\n\n**Reglas básicas:**\n• lím(x→a) c = c (constante)\n• lím(x→a) x = a\n• lím(suma) = suma de límites\n• lím(producto) = producto de límites\n\n**Formas indeterminadas (usar L'Hôpital):**\n0/0, ∞/∞, 0·∞...\n\n**Ejemplo:**\nlím(x→2) (x²−4)/(x−2)\n= lím(x→2) (x+2)(x−2)/(x−2)\n= lím(x→2) (x+2) = 4`;
+  }
+  if(lq.includes('cadena')||lq.includes('chain rule')){
+    return `**Regla de la Cadena** ⛓\n\nSe usa para derivar funciones compuestas f(g(x)).\n\n**Fórmula:**\nd/dx[f(g(x))] = f'(g(x)) · g'(x)\n\n**Notación de Leibniz:**\ndy/dx = (dy/du) · (du/dx)\n\n**Ejemplos:**\n1. d/dx[(x²+1)⁵]\n   u = x²+1, du/dx = 2x\n   = 5(x²+1)⁴ · 2x = 10x(x²+1)⁴\n\n2. d/dx[sen(3x)]\n   = cos(3x) · 3 = 3cos(3x)\n\n3. d/dx[e^(x²)]\n   = e^(x²) · 2x`;
+  }
+  return `¡Excelente pregunta sobre matemáticas! 🧮\n\nPara obtener una explicación detallada y personalizada, te recomiendo:\n\n1. **Ingresa tu clave API de Anthropic** en el panel izquierdo para activar el tutor completo con Claude.\n\n2. **Usa la sección Calculadora** para problemas de Álgebra, Geometría y Conversiones.\n\n3. **Temas que puedo explicar sin API:**\n• Ecuaciones cuadráticas\n• Teorema de Pitágoras\n• Derivadas\n• Logaritmos\n• Área del círculo\n• Límites\n\n¿Sobre cuál de estos quieres aprender más?`;
+}
+
+function addMsg(role, text){
+  const msgs = document.getElementById('msgs');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const now = new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});
+
+  // Format text: bold, code blocks
+  let formatted = text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .split('\n')
+    .map(line => line.startsWith('  ')||line.match(/^[•\d]/)
+      ? `<code>${line}</code>`
+      : `<p>${line}</p>`)
+    .join('');
+
+  div.innerHTML = `
+    <div class="mav">${role==='user'?'<i class="fas fa-user"></i>':'∑'}</div>
+    <div class="mbub">
+      ${formatted}
+      <div class="mtime">${now}</div>
+    </div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping(){
+  const msgs = document.getElementById('msgs');
+  const div = document.createElement('div');
+  div.className = 'typing'; div.id = 'typing';
+  div.innerHTML = `
+    <div class="mav">∑</div>
+    <div class="tdots"><span></span><span></span><span></span></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping(){
+  const t = document.getElementById('typing');
+  if(t) t.remove();
+}
+
+function clearChat(){
+  document.getElementById('msgs').innerHTML = '';
+  chatHistory = [];
+  addMsg('assistant', '¡Conversación limpiada! ¿En qué puedo ayudarte con tus matemáticas?');
+}
+
+/* ==========================================================
+   INITIALIZATION
+========================================================== */
+window.addEventListener('load', () => {
+  renderGeoFields();
+  redrawShape();
+  buildUnitSelects();
+});
+</script>
+</body>
+</html>
